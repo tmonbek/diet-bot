@@ -36,7 +36,7 @@ func Register(b *tele.Bot) {
 	c.AddFunc("0 19 * * *", func() {
 		b.Send(tele.ChatID(chatID), "Kechki ovqat vaqti boldi: 200g mol goshti  yoki baliq va salat bodring pomidor")
 	})
-	
+
 	c.AddFunc("30 22 * * *", func() {
 		b.Send(tele.ChatID(chatID), "кеч 22:30 ларда! 2 та кайнатилган тухум оки  1 порц вей изолят ичига 5 гр аргенин солиб  250 мл сувга аралаштириб ичамиз")
 	})
