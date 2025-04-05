@@ -19,5 +19,13 @@ func Register(b *tele.Bot) {
 		return c.Send("тухум, помидор, зелень, грудинка, оливка, бодринг, мол гошти")
 	})
 
+	b.Handle("/help", func(c tele.Context) error {
+		ID := c.Chat().ID
+
+		slog.Info("help", "chatID", ID)
+
+		return c.Send("Hello!")
+	})
+
 	slog.Info("handlers registered")
 }
