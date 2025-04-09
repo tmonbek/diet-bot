@@ -15,8 +15,13 @@ func Register(b *tele.Bot) {
 	c := cron.New()
 	var chats = postgres.GetAllChats()
 
-	c.AddFunc("@hourly", func() {
-		broadcast(b, "Suv ichish vaqti boldi", chats)
+	c.AddFunc("@every 2h", func() {
+		now := time.Now()
+		hour := now.Hour()
+
+		if hour >= 7 && hour < 22 {
+			broadcast(b, "Suv ichish vaqti boldi", chats)
+		}
 	})
 
 	c.AddFunc("30 7 * * *", func() {
