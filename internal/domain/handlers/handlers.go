@@ -9,6 +9,7 @@ import (
 	"math"
 	"strconv"
 
+	"github.com/jackc/pgx/v5"
 	tele "gopkg.in/telebot.v4"
 )
 
@@ -21,13 +22,33 @@ func Register(b *tele.Bot) {
 	})
 
 	b.Handle("/start", func(c tele.Context) error {
+		var userID int64
 		err := postgres.Pool.QueryRow(context.Background(),
-			"INSERT INTO users (user_id) VALUES ($1) RETURNING id",
-			c.Chat().ID)
+			"SELECT user_id FROM users WHERE user_id = $1",
+			c.Chat().ID,
+		).Scan(&userID)
+
 		if err != nil {
-			log.Printf("Insert error: %v", err)
+			if err == pgx.ErrNoRows {
+				var newID int
+				err = postgres.Pool.QueryRow(context.Background(),
+					"INSERT INTO users (user_id) VALUES ($1) RETURNING id",
+					c.Chat().ID,
+				).Scan(&newID)
+
+				if err != nil {
+					log.Printf("Insert error: %v", err)
+					return c.Send("Something went wrong. Please try again later.")
+				}
+
+				return c.Send(fmt.Sprintf("Welcome %s!", c.Sender().FirstName))
+			} else {
+				log.Printf("Query error: %v", err)
+				return c.Send("Something went wrong. Please try again later.")
+			}
 		}
-		return c.Send("Welcome %s!", c.Sender().FirstName)
+
+		return c.Send(fmt.Sprintf("Welcome back %s!", c.Sender().FirstName))
 	})
 
 	b.Handle("/getInfo", func(c tele.Context) error {

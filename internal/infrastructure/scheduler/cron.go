@@ -14,12 +14,14 @@ import (
 func Register(b *tele.Bot) {
 	c := cron.New()
 	var chats = postgres.GetAllChats()
+	from := 7
+	to := 22
 
 	c.AddFunc("@every 2h", func() {
 		now := time.Now()
 		hour := now.Hour()
 
-		if hour >= 7 && hour < 22 {
+		if hour >= from && hour < to {
 			broadcast(b, "Suv ichish vaqti boldi", chats)
 		}
 	})
