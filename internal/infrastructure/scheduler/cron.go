@@ -1,6 +1,7 @@
 package scheduler
 
 import (
+	"context"
 	postgres "diet-bot/internal/store"
 	"log"
 	"log/slog"
@@ -13,7 +14,12 @@ import (
 
 func Register(b *tele.Bot) {
 	c := cron.New()
-	var chats = postgres.GetAllChats()
+	repo := postgres.UserRepo
+	chats, err := repo.GetAllChats(context.Background())
+	if err != nil {
+		slog.Error("Failed to get chats", "error", err)
+		return
+	}
 	from := 7
 	to := 22
 

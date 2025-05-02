@@ -5,11 +5,15 @@ import (
 	"log"
 	"os"
 
+	"diet-bot/internal/domain/repository"
+	"diet-bot/internal/infrastructure/persistence"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 var Pool *pgxpool.Pool
+var UserRepo repository.UserRepository
 
 func InitDB() {
 	connStr := os.Getenv("CONNECTION_STRING")
@@ -24,34 +28,10 @@ func InitDB() {
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v", err)
 	}
+
+	UserRepo = persistence.NewPostgresUserRepository(Pool)
 }
 
 func CloseDB() {
 	Pool.Close()
-}
-
-func GetAllChats() []int64 {
-	var chatIDs []int64
-
-	rows, err := Pool.Query(context.Background(), "SELECT user_id FROM users")
-	if err != nil {
-		log.Printf("Failed to query users: %v", err)
-		return nil
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var chatID int64
-		if err := rows.Scan(&chatID); err != nil {
-			log.Printf("Failed to scan row: %v", err)
-			continue // Пропускаем ошибочную строку, не прерываем всю функцию
-		}
-		chatIDs = append(chatIDs, chatID)
-	}
-
-	if err := rows.Err(); err != nil {
-		log.Printf("Rows iteration error: %v", err)
-	}
-
-	return chatIDs
 }
