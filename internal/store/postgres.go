@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"log"
+	"log/slog"
 	"os"
 
 	"diet-bot/internal/domain/repository"
@@ -30,6 +31,7 @@ func InitDB() {
 	}
 
 	UserRepo = persistence.NewPostgresUserRepository(Pool)
+	slog.Info("Connected to database")
 }
 
 func CloseDB() {
